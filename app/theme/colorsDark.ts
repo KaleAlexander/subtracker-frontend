@@ -1,38 +1,38 @@
 const palette = {
   neutral900: "#FFFFFF",
-  neutral800: "#F4F2F1",
-  neutral700: "#D7CEC9",
-  neutral600: "#B6ACA6",
-  neutral500: "#978F8A",
-  neutral400: "#564E4A",
-  neutral300: "#3C3836",
-  neutral200: "#191015",
-  neutral100: "#000000",
+  neutral800: "#F8F7FF", // Light purple-white
+  neutral700: "#E2DFFF", // Light purple
+  neutral600: "#C5BFFF", // Medium light purple
+  neutral500: "#A297FF", // Medium purple
+  neutral400: "#7161EF", // Medium dark purple
+  neutral300: "#443AA6", // Dark purple
+  neutral200: "#22184F", // Very dark purple
+  neutral100: "#121212", // Near black
 
-  primary600: "#F4E0D9",
-  primary500: "#E8C1B4",
-  primary400: "#DDA28E",
-  primary300: "#D28468",
-  primary200: "#C76542",
-  primary100: "#A54F31",
+  primary600: "#FFE0F5", // Lightest pink
+  primary500: "#FFC5EB", // Light pink
+  primary400: "#FF9DE0", // Medium light pink
+  primary300: "#FF71CE", // Medium pink (from logo)
+  primary200: "#E03AAD", // Medium dark pink
+  primary100: "#B01E88", // Dark pink
 
-  secondary500: "#DCDDE9",
-  secondary400: "#BCC0D6",
-  secondary300: "#9196B9",
-  secondary200: "#626894",
-  secondary100: "#41476E",
+  secondary500: "#D9FEFF", // Lightest cyan
+  secondary400: "#B0FDFF", // Light cyan
+  secondary300: "#78FBFF", // Medium light cyan
+  secondary200: "#01CDFE", // Medium cyan (from logo)
+  secondary100: "#00A4CF", // Medium dark cyan
 
-  accent500: "#FFEED4",
-  accent400: "#FFE1B2",
-  accent300: "#FDD495",
-  accent200: "#FBC878",
-  accent100: "#FFBB50",
+  accent500: "#E0FFF0", // Lightest mint
+  accent400: "#BAFFD9", // Light mint
+  accent300: "#7AFFBE", // Medium light mint
+  accent200: "#05FFA1", // Medium mint (from logo)
+  accent100: "#00DA85", // Medium dark mint
 
-  angry100: "#F2D6CD",
-  angry500: "#C03403",
+  angry100: "#FF3D71",
+  angry500: "#FFE0E0",
 
-  overlay20: "rgba(25, 16, 21, 0.2)",
-  overlay50: "rgba(25, 16, 21, 0.5)",
+  overlay20: "rgba(18, 18, 18, 0.2)",
+  overlay50: "rgba(18, 18, 18, 0.5)",
 } as const
 
 export const colors = {
