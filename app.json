@@ -18,8 +18,9 @@
       "**/*"
     ],
     "android": {
+      "googleServicesFile": "./google-services.json",
       "icon": "./assets/images/app-icon-android-legacy.png",
-      "package": "com.subtracker",
+      "package": "com.subtracker.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -28,7 +29,8 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.subtracker"
+      "bundleIdentifier": "com.subtracker.app",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "web": {
       "favicon": "./assets/images/app-icon-web-favicon.png",
@@ -37,6 +39,8 @@
     "plugins": [
       "expo-localization",
       "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
       [
         "expo-splash-screen",
         {
@@ -44,6 +48,18 @@
           "imageWidth": 300,
           "resizeMode": "contain",
           "backgroundColor": "#191015"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "podfileProperties": {
+              "use_modular_headers!": true
+            },
+            "flipper": false
+          }
         }
       ]
     ],

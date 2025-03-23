@@ -9,18 +9,19 @@ const palette = {
   neutral800: "#22184F", // Very dark purple
   neutral900: "#121212", // Near black
 
-  primary100: "#FFE0F5", // Lightest pink
-  primary200: "#FFC5EB", // Light pink
-  primary300: "#FF9DE0", // Medium light pink
-  primary400: "#FF71CE", // Medium pink (from logo)
-  primary500: "#E03AAD", // Medium dark pink
-  primary600: "#B01E88", // Dark pink
+  primary100: "#D9FEFF", // Lightest cyan
+  primary200: "#B0FDFF", // Light cyan
+  primary300: "#78FBFF", // Medium light cyan
+  primary400: "#01CDFE", // Medium cyan (from logo)
+  primary500: "#00A4CF", // Medium dark cyan
+  primary600: "#0080A0", // Dark cyan (added to match structure)
 
-  secondary100: "#D9FEFF", // Lightest cyan
-  secondary200: "#B0FDFF", // Light cyan
-  secondary300: "#78FBFF", // Medium light cyan
-  secondary400: "#01CDFE", // Medium cyan (from logo)
-  secondary500: "#00A4CF", // Medium dark cyan
+  secondary100: "#FFE0F5", // Lightest pink
+  secondary200: "#FFC5EB", // Light pink
+  secondary300: "#FF9DE0", // Medium light pink
+  secondary400: "#FF71CE", // Medium pink (from logo)
+  secondary500: "#E03AAD", // Medium dark pink
+  secondary600: "#B01E88", // Dark pink
 
   accent100: "#E0FFF0", // Lightest mint
   accent200: "#BAFFD9", // Light mint

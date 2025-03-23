@@ -1,26 +1,10 @@
-import { ComponentType } from "react"
-import {
-  Pressable,
-  PressableProps,
-  PressableStateCallbackType,
-  StyleProp,
-  TextStyle,
-  ViewStyle,
-} from "react-native"
-import type { ThemedStyle, ThemedStyleArray } from "@/theme"
-import { $styles } from "../theme"
-import { Text, TextProps } from "./Text"
+import { FC } from "react"
+import { View, Pressable, StyleSheet, ViewStyle, TextStyle, StyleProp } from "react-native"
+import { Text, TextProps } from "./Text" // Your existing Text component
 import { useAppTheme } from "@/utils/useAppTheme"
+import type { ThemedStyle } from "@/theme"
 
-type Presets = "default" | "filled" | "reversed"
-
-export interface ButtonAccessoryProps {
-  style: StyleProp<any>
-  pressableState: PressableStateCallbackType
-  disabled?: boolean
-}
-
-export interface ButtonProps extends PressableProps {
+export interface ButtonProps {
   /**
    * Text which is looked up via i18n.
    */
@@ -35,212 +19,286 @@ export interface ButtonProps extends PressableProps {
    */
   txOptions?: TextProps["txOptions"]
   /**
-   * An optional style override useful for padding & margin.
+   * An optional style override for the button.
    */
   style?: StyleProp<ViewStyle>
-  /**
-   * An optional style override for the "pressed" state.
-   */
-  pressedStyle?: StyleProp<ViewStyle>
   /**
    * An optional style override for the button text.
    */
   textStyle?: StyleProp<TextStyle>
   /**
-   * An optional style override for the button text when in the "pressed" state.
+   * Called when the button is pressed.
    */
-  pressedTextStyle?: StyleProp<TextStyle>
+  onPress?: () => void
   /**
-   * An optional style override for the button text when in the "disabled" state.
+   * An optional icon component to render inside the button.
    */
-  disabledTextStyle?: StyleProp<TextStyle>
+  icon?: React.ReactNode
   /**
-   * One of the different types of button presets.
-   */
-  preset?: Presets
-  /**
-   * An optional component to render on the right side of the text.
-   * Example: `RightAccessory={(props) => <View {...props} />}`
-   */
-  RightAccessory?: ComponentType<ButtonAccessoryProps>
-  /**
-   * An optional component to render on the left side of the text.
-   * Example: `LeftAccessory={(props) => <View {...props} />}`
-   */
-  LeftAccessory?: ComponentType<ButtonAccessoryProps>
-  /**
-   * Children components.
-   */
-  children?: React.ReactNode
-  /**
-   * disabled prop, accessed directly for declarative styling reasons.
-   * https://reactnative.dev/docs/pressable#disabled
+   * Whether the button is disabled.
    */
   disabled?: boolean
   /**
-   * An optional style override for the disabled state
+   * Button type - primary (cyan), secondary (pink), or accent (mint)
    */
-  disabledStyle?: StyleProp<ViewStyle>
+  type?: "primary" | "secondary" | "accent"
+  /**
+   * Reverse the button colors (background/text)
+   */
+  reversed?: boolean
+  /**
+   * Use fixed width instead of full width
+   */
+  fixedWidth?: boolean
 }
 
 /**
- * A component that allows users to take actions and make choices.
- * Wraps the Text component with a Pressable component.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Button/}
- * @param {ButtonProps} props - The props for the `Button` component.
- * @returns {JSX.Element} The rendered `Button` component.
- * @example
- * <Button
- *   tx="common:ok"
- *   style={styles.button}
- *   textStyle={styles.buttonText}
- *   onPress={handleButtonPress}
- * />
+ * A custom button component that has a stacked appearance.
  */
-export function Button(props: ButtonProps) {
-  const {
-    tx,
-    text,
-    txOptions,
-    style: $viewStyleOverride,
-    pressedStyle: $pressedViewStyleOverride,
-    textStyle: $textStyleOverride,
-    pressedTextStyle: $pressedTextStyleOverride,
-    disabledTextStyle: $disabledTextStyleOverride,
-    children,
-    RightAccessory,
-    LeftAccessory,
-    disabled,
-    disabledStyle: $disabledViewStyleOverride,
-    ...rest
-  } = props
+export const Button: FC<ButtonProps> = ({
+  tx,
+  text,
+  txOptions,
+  style,
+  textStyle,
+  onPress,
+  icon,
+  disabled = false,
+  type = "primary",
+  reversed = false,
+  fixedWidth = false,
+}) => {
+  const { themed, theme } = useAppTheme()
 
-  const { themed } = useAppTheme()
+  // Get the appropriate styles based on button type
+  const getBottomLayerStyle = () => {
+    if (type === "secondary") return themed($secondaryBottomLayer)
+    if (type === "accent") return themed($accentBottomLayer)
+    return themed($bottomLayer) // primary (default)
+  }
 
-  const preset: Presets = props.preset ?? "default"
-  /**
-   * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
-   * @param {boolean} root0.pressed - The pressed state.
-   * @returns {StyleProp<ViewStyle>} The view style based on the pressed state.
-   */
-  function $viewStyle({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> {
-    return [
-      themed($viewPresets[preset]),
-      $viewStyleOverride,
-      !!pressed && themed([$pressedViewPresets[preset], $pressedViewStyleOverride]),
-      !!disabled && $disabledViewStyleOverride,
-    ]
+  // Get the appropriate styles based on reversed state
+  const getButtonLayerStyle = () => {
+    if (reversed) {
+      if (type === "secondary") return themed($secondaryReversedButtonLayer)
+      if (type === "accent") return themed($accentReversedButtonLayer)
+      return themed($reversedButtonLayer) // primary reversed
+    }
+    return themed($buttonLayer) // default (not reversed)
   }
-  /**
-   * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
-   * @param {boolean} root0.pressed - The pressed state.
-   * @returns {StyleProp<TextStyle>} The text style based on the pressed state.
-   */
-  function $textStyle({ pressed }: PressableStateCallbackType): StyleProp<TextStyle> {
-    return [
-      themed($textPresets[preset]),
-      $textStyleOverride,
-      !!pressed && themed([$pressedTextPresets[preset], $pressedTextStyleOverride]),
-      !!disabled && $disabledTextStyleOverride,
-    ]
+
+  // Get the appropriate text style based on reversed state
+  const getTextStyle = () => {
+    if (reversed) {
+      if (type === "secondary") return themed($secondaryReversedButtonText)
+      if (type === "accent") return themed($accentReversedButtonText)
+      return themed($reversedButtonText) // primary reversed
+    }
+    return themed($buttonText) // default (not reversed)
   }
+
+  // Apply full width or fixed width
+  const containerStyles = [
+    themed($container),
+    fixedWidth ? themed($fixedWidthContainer) : themed($fullWidthContainer),
+    style
+  ]
 
   return (
-    <Pressable
-      style={$viewStyle}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
-      {...rest}
-      disabled={disabled}
-    >
-      {(state) => (
-        <>
-          {!!LeftAccessory && (
-            <LeftAccessory style={$leftAccessoryStyle} pressableState={state} disabled={disabled} />
-          )}
+    <View style={containerStyles}>
+      {/* Bottom layer (creates the stacked effect) */}
+      <View style={getBottomLayerStyle()} />
 
-          <Text tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}>
-            {children}
-          </Text>
-
-          {!!RightAccessory && (
-            <RightAccessory
-              style={$rightAccessoryStyle}
-              pressableState={state}
-              disabled={disabled}
-            />
-          )}
-        </>
-      )}
-    </Pressable>
+      {/* Main button layer */}
+      <Pressable
+        style={({ pressed }) => [
+          getButtonLayerStyle(),
+          fixedWidth ? null : themed($fullWidthButtonLayer),
+          pressed && themed($pressedButtonLayer),
+          disabled && themed($disabledButtonLayer),
+        ]}
+        onPress={onPress}
+        disabled={disabled}
+      >
+        <View style={styles.contentContainer}>
+          <Text
+            tx={tx}
+            text={text}
+            txOptions={txOptions}
+            style={[getTextStyle(), textStyle, disabled && themed($disabledButtonText)]}
+          />
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
+        </View>
+      </Pressable>
+    </View>
   )
 }
 
-const $baseViewStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  minHeight: 56,
-  borderRadius: 4,
+const styles = StyleSheet.create({
+  contentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconContainer: {
+    marginLeft: 8,
+  },
+})
+
+const $container: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  position: "relative",
+  marginVertical: spacing.xs,
+})
+
+const $fullWidthContainer: ThemedStyle<ViewStyle> = () => ({
+  width: "100%",
+  alignSelf: "stretch",
+})
+
+const $fixedWidthContainer: ThemedStyle<ViewStyle> = () => ({
+  alignSelf: "center",
+})
+
+const $fullWidthButtonLayer: ThemedStyle<ViewStyle> = () => ({
+  width: "100%",
+})
+
+// Primary button styles (cyan)
+const $bottomLayer: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  position: "absolute",
+  bottom: -4,
+  left: 3,
+  right: -3,
+  height: "100%",
+  backgroundColor: colors.palette.primary200, // Cyan
+  borderRadius: 8,
+  zIndex: 1,
+})
+
+// Secondary button styles (pink)
+const $secondaryBottomLayer: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  position: "absolute",
+  bottom: -4,
+  left: 3,
+  right: -3,
+  height: "100%",
+  backgroundColor: colors.palette.secondary200, // Pink
+  borderRadius: 8,
+  zIndex: 1,
+})
+
+// Accent button styles (mint)
+const $accentBottomLayer: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  position: "absolute",
+  bottom: -4,
+  left: 3,
+  right: -3,
+  height: "100%",
+  backgroundColor: colors.palette.accent200, // Mint
+  borderRadius: 8,
+  zIndex: 1,
+})
+
+// Default button layer
+const $buttonLayer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  minHeight: 50,
+  minWidth: 180,
+  backgroundColor: colors.palette.neutral100, // White in light mode, black in dark mode
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: colors.palette.neutral300,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.md,
+  zIndex: 2,
   justifyContent: "center",
   alignItems: "center",
-  paddingVertical: spacing.sm,
-  paddingHorizontal: spacing.sm,
-  overflow: "hidden",
 })
 
-const $baseTextStyle: ThemedStyle<TextStyle> = ({ typography }) => ({
+// Reversed primary button (cyan background)
+const $reversedButtonLayer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  minHeight: 50,
+  minWidth: 180,
+  backgroundColor: colors.palette.primary400, // Cyan background
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: colors.palette.primary300,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.md,
+  zIndex: 2,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+// Reversed secondary button (pink background)
+const $secondaryReversedButtonLayer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  minHeight: 50,
+  minWidth: 180,
+  backgroundColor: colors.palette.secondary400, // Pink background
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: colors.palette.secondary300,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.md,
+  zIndex: 2,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+// Reversed accent button (mint background)
+const $accentReversedButtonLayer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  minHeight: 50,
+  minWidth: 180,
+  backgroundColor: colors.palette.accent400, // Mint background
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: colors.palette.accent300,
+  paddingVertical: spacing.xs,
+  paddingHorizontal: spacing.md,
+  zIndex: 2,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $pressedButtonLayer: ThemedStyle<ViewStyle> = () => ({
+  transform: [{ translateY: 2 }], // Move slightly down when pressed
+})
+
+const $disabledButtonLayer: ThemedStyle<ViewStyle> = () => ({
+  opacity: 0.6,
+})
+
+// Default text style
+const $buttonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: colors.text,
   fontSize: 16,
-  lineHeight: 20,
   fontFamily: typography.primary.medium,
   textAlign: "center",
-  flexShrink: 1,
-  flexGrow: 0,
-  zIndex: 2,
 })
 
-const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginStart: spacing.xs,
-  zIndex: 1,
+// Reversed text style for primary button
+const $reversedButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: colors.palette.neutral100, // White text on dark background
+  fontSize: 16,
+  fontFamily: typography.primary.medium,
+  textAlign: "center",
 })
-const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginEnd: spacing.xs,
-  zIndex: 1,
+
+// Reversed text style for secondary button
+const $secondaryReversedButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: colors.palette.neutral100, // White text on dark background
+  fontSize: 16,
+  fontFamily: typography.primary.medium,
+  textAlign: "center",
 })
 
-const $viewPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
-  default: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({
-      borderWidth: 1,
-      borderColor: colors.palette.neutral400,
-      backgroundColor: colors.palette.neutral100,
-    }),
-  ],
-  filled: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral300 }),
-  ],
-  reversed: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral800 }),
-  ],
-}
+// Reversed text style for accent button
+const $accentReversedButtonText: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
+  color: colors.palette.neutral100, // White text on dark background
+  fontSize: 16,
+  fontFamily: typography.primary.medium,
+  textAlign: "center",
+})
 
-const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
-  default: [$baseTextStyle],
-  filled: [$baseTextStyle],
-  reversed: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
-}
-
-const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
-  default: ({ colors }) => ({ backgroundColor: colors.palette.neutral200 }),
-  filled: ({ colors }) => ({ backgroundColor: colors.palette.neutral400 }),
-  reversed: ({ colors }) => ({ backgroundColor: colors.palette.neutral700 }),
-}
-
-const $pressedTextPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
-  default: () => ({ opacity: 0.9 }),
-  filled: () => ({ opacity: 0.9 }),
-  reversed: () => ({ opacity: 0.9 }),
-}
+const $disabledButtonText: ThemedStyle<TextStyle> = () => ({
+  opacity: 0.6,
+})
